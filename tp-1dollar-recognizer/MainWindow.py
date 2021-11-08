@@ -34,10 +34,10 @@ class MainWindow(QMainWindow):
 
 
         ################################
-        # TODO 2: create the template gallery
+        # ODO 2: create the template gallery
         ###############################
-        #self.create_template_gallery()
-        #v_layout.addWidget( self.gallery )
+        self.gallery = self.create_template_gallery()
+        v_layout.addWidget( self.gallery )
 
         self.canvas = Canvas()
         v_layout.addWidget(self.canvas)
@@ -55,40 +55,45 @@ class MainWindow(QMainWindow):
 
 
         ################################
-        # TODO 3: fill the template gallery
+        # ODO 3: fill the template gallery
         ###############################
         name = ["Triangle", "X", "Rectangle", "Circle", "Check", "Caret", "Question", "Arrow", "left square bracket",
                 "Right square bracket", "V", "Delete", "Left curly brace", "Right curly brace", "Star", "Pigtail"]
-        #todo load the database
-        data = []
-        labels = []
+        #odo load the database
+        d = pickle.load(open('./onedol_ds.pkl', 'rb'))
+        data = d['dataset']
+        labels = d['labels']
 
         label = -1
         all_gesture = False
         for gesture, label_index in zip(data, labels):
             if label_index != label:
-                # todo 3 add the template in the gallery
-
-                # todo 4 add the template to the one_dollar_recognizer
-
+                # odo 3 add the template in the gallery
+                self.add_template_thumbnail(gesture, name[label])
+                # odo 4 add the template to the one_dollar_recognizer
+                self.canvas.oneDollar.addTemplate(gesture, name[label])
                 if not all_gesture:
                     label = label_index
 
 
     ##########################
-    # TODO 2: create the gallery (QListWidget)
+    # ODO 2: create the gallery (QListWidget)
     ##########################
     def create_template_gallery(self):
         gallery = QListWidget()
         gallery.setFixedHeight(150)
 
-        #todo 2 customize the gallery
+        #odo 2 customize the gallery
+
+        gallery.setViewMode(QListView.IconMode)
+        gallery.setUniformItemSizes(True)
+        gallery.setIconSize(QSize(50, 50))
 
         return gallery
 
 
     ################################
-    # TODO 3: fill the template gallery
+    # ODO 3: fill the template gallery
     ###############################
     def add_template_thumbnail(self, g, label):
 
@@ -99,10 +104,12 @@ class MainWindow(QMainWindow):
         thumbnail_widget.render(pix, QPoint(), QRegion(0, 0, thumbnail_widget.width(), thumbnail_widget.height()));
         icon = QIcon(pix)
 
-        #todo 3 create and add the corresponding item in the gallery
+        #odo 3 create and add the corresponding item in the gallery
+
+        self.gallery.addItem(QListWidgetItem(icon, str(label)))
 
 
-    #######################
+        #######################
     # TODO 9
     #######################
     def set_action_on_gesture(self, label, id, score):

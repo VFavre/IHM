@@ -119,10 +119,11 @@ class OneDollar(object):
     #########################################
     def rotateToZero(self, points):
         centroid = np.mean(points, 0)
-        newPoints = points      #remove this line, it is just for compilation
-
-        #todo
-
+        #newPoints = points      #remove this line, it is just for compilation
+        angle = np.arctan2(centroid[0]-points[0][0], centroid[1]-points[0][1])
+        newPoints = []
+        for point in points:
+            newPoints.append(self.rotateBy(point,angle))
         return newPoints
 
     #########################################
@@ -152,6 +153,7 @@ class OneDollar(object):
 
     ################################
     def translateToOrigin(self, points):
+        #print(points)
         centroid = np.mean(points, 0)
         newPoints = np.zeros((1, 2))
         self.translation = centroid
