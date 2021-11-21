@@ -24,7 +24,7 @@ class OneDollar(object):
 
 
     #########################################
-    # TODO 8
+    # ODO 8
     #
     #########################################
     def recognize(self, points):
@@ -32,6 +32,7 @@ class OneDollar(object):
         template_id = -1
         label = "None"
         points = self.resample(points, numPoints)
+        self.resampled_gesture = points
         points = self.rotateToZero(points)
         points = self.scaleToSquare(points)
         points = self.translateToOrigin(points)

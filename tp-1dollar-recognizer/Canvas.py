@@ -27,7 +27,7 @@ class Canvas(QWidget):
 
 
     ##########################
-    # TODO 9: create a selected_template signal with three parameters: label, template_id, score
+    # ODO 9: create a selected_template signal with three parameters: label, template_id, score
     ##########################
 
     selected_template = pyqtSignal(str, int, float)
@@ -48,9 +48,8 @@ class Canvas(QWidget):
         # TODO 11 create a timer
         # connect the timer to the sole timout
         #############################
-
-
-
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timeout)
 
     ##############################
     def paintEvent(self, QPaintEvent):
@@ -85,14 +84,27 @@ class Canvas(QWidget):
         self.animation = True       #used in paintEvent to know whether it displays the traces or the animated feedback
         nb_step = 50
 
+        if self.counter >= nb_step:
+            self.timer.stop()
+            self.animation = False
+
         # TODO 11
         # self.termination is the template
         # self.path is the original gesture
         # self.feedback is the feedback path to animate
         # Weight should be within [0,1]
         # self.feedback = interpolate(x1, y1, x2, x2, weight)
-
-
+        for i in range(len(self.termination)):
+            x_term = self.termination[i].x()
+            y_term = self.termination[i].y()
+            x_path = self.path[i].x()
+            y_path = self.path[i].y()
+            try:
+                weight = 1 / self.counter
+            except:
+                weight = 1
+            inter = interpolate(x_path, y_path, x_term, y_term, weight)
+            self.feedback[i] = QPoint(inter[0], inter[1])
         self.counter += 1
         self.repaint()
 
@@ -143,14 +155,16 @@ class Canvas(QWidget):
     #############################
     def display_feedback(self, template_id):
 
-        #todo 10
-        #self.termination = ...
+        #odo 10
+        self.termination = self.get_feedback(template_id)
 
         #todo 11
-        #self.path = ...
-        #self.feedback = self.path
+        self.path = points_to_qpolygonF(self.oneDollar.resampled_gesture)
+        self.feedback = self.path
 
         #create a timer
+        self.timer.setInterval(500)
+        self.timer.start()
         self.counter = 0
 
 
