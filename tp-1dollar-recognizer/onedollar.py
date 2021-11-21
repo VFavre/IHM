@@ -1,3 +1,6 @@
+import math
+
+import numpy
 import numpy as np
 import numpy.linalg as linalg
 
@@ -25,10 +28,23 @@ class OneDollar(object):
     #
     #########################################
     def recognize(self, points):
-        template_id = -1
-        label = "None"
-        score = 0
-        return template_id, label, score
+        b = math.inf
+        template_p = None
+        points = self.resample(points, numPoints)
+        points = self.rotateToZero(points)
+        points = self.scaleToSquare(points)
+        points = self.translateToOrigin(points)
+        for t in self.templates:
+            d = self.distanceAtBestAngle(points, t, -1 * self.angle_range, self.angle_range, self.angle_step)
+            if d < b:
+                b = d
+                template_p = t
+        score = 1-(b/0.5*math.sqrt(self.square_size**2 * 2))
+        # template_id = -1
+        # label = "None"
+        # score = 0
+
+        return template_p, score
 
 
     #########################################
@@ -104,9 +120,9 @@ class OneDollar(object):
     def addTemplate(self, template, label):
         points = []
         for i in range(template.shape[0]):
-            points.append([template[i,0], template[i,1]])
+            points.append([template[i, 0], template[i, 1]])
         points = self.resample(points, numPoints)
-        self.resampled_templates.append( points )
+        self.resampled_templates.append(points)
         points = self.rotateToZero(points)
         points = self.scaleToSquare(points)
         points = self.translateToOrigin(points)
@@ -115,37 +131,53 @@ class OneDollar(object):
 
 
     #########################################
-    # TODO 6
+    #  6
     #########################################
     def rotateToZero(self, points):
         centroid = np.mean(points, 0)
-        #newPoints = points      #remove this line, it is just for compilation
         angle = np.arctan2(centroid[0]-points[0][0], centroid[1]-points[0][1])
-        newPoints = []
-        for point in points:
-            newPoints.append(self.rotateBy(point,angle))
+        print(points)
+        newPoints = self.rotateBy(points, angle)
         return newPoints
 
     #########################################
-    # TODO 6
+    # ODO 6
     #########################################
     def rotateBy(self, points, angle):
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
-
-        #todo 6 update the vector newPoints
-
+        centroid = np.mean(points, 0)
+        #odo 6 update the vector newPoints
+        for p in points:
+            new_x = (p[0] - centroid[0]) * numpy.cos(angle) - (p[1] - centroid[1]) * numpy.sin(angle) + centroid[0]
+            new_y = (p[0] - centroid[0]) * numpy.sin(angle) - (p[1] - centroid[1]) * numpy.cos(angle) + centroid[1]
+            temp = np.array([[new_x, new_y]])
+            newPoints = np.concatenate((newPoints, temp))
         newPoints = newPoints[1:]       #remove the first point [0,0]
         return newPoints
 
 
     #########################################
-    # TODO 7
+    # ODO 7
     #########################################
     def scaleToSquare(self, points):
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
+        print(points)
+        #newarr = points.reshape(points.shape[0], (points.shape[1]*points.shape[2]))
+        temp = points[:, 0]
+        X = points[:, 0]
+        x_max = np.amax(X)
+        x_min = np.amin(X)
+        Y = points[:, 1]
+        y_max = np.amax(Y)
+        y_min = np.amin(Y)
+        X_bb = x_max - x_min
+        Y_bb = y_max - y_min
 
-        #todo 7
-
+        #odo 7
+        for p in points:
+            new_x = p[0] * (self.square_size/X_bb)
+            new_y = p[1] * (self.square_size/Y_bb)
+            newPoints = np.concatenate((newPoints, np.array([[new_x, new_y]])))
         newPoints = newPoints[1:]      #remove the first point [0,0]
         return newPoints
 
