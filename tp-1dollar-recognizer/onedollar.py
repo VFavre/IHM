@@ -24,27 +24,32 @@ class OneDollar(object):
 
 
     #########################################
-    # TODO 8
+    # ODO 8
     #
     #########################################
     def recognize(self, points):
         b = math.inf
-        template_p = None
+        template_id = -1
+        label = "None"
         points = self.resample(points, numPoints)
+        self.resampled_gesture = points
         points = self.rotateToZero(points)
         points = self.scaleToSquare(points)
         points = self.translateToOrigin(points)
+        i=0
         for t in self.templates:
             d = self.distanceAtBestAngle(points, t, -1 * self.angle_range, self.angle_range, self.angle_step)
             if d < b:
                 b = d
-                template_p = t
-        score = 1-(b/0.5*math.sqrt(self.square_size**2 * 2))
+                template_id = i
+            i += 1
+
+        score = 1-b/(0.5*math.sqrt(self.square_size**2 * 2))
         # template_id = -1
         # label = "None"
         # score = 0
 
-        return template_p, score
+        return template_id, self.labels[template_id], score
 
 
     #########################################
@@ -135,9 +140,8 @@ class OneDollar(object):
     #########################################
     def rotateToZero(self, points):
         centroid = np.mean(points, 0)
-        angle = np.arctan2(centroid[0]-points[0][0], centroid[1]-points[0][1])
-        print(points)
-        newPoints = self.rotateBy(points, angle)
+        angle = np.arctan2(centroid[1]-points[0][1], centroid[0]-points[0][0])
+        newPoints = self.rotateBy(points, -angle)
         return newPoints
 
     #########################################
@@ -149,7 +153,7 @@ class OneDollar(object):
         #odo 6 update the vector newPoints
         for p in points:
             new_x = (p[0] - centroid[0]) * numpy.cos(angle) - (p[1] - centroid[1]) * numpy.sin(angle) + centroid[0]
-            new_y = (p[0] - centroid[0]) * numpy.sin(angle) - (p[1] - centroid[1]) * numpy.cos(angle) + centroid[1]
+            new_y = (p[0] - centroid[0]) * numpy.sin(angle) + (p[1] - centroid[1]) * numpy.cos(angle) + centroid[1]
             temp = np.array([[new_x, new_y]])
             newPoints = np.concatenate((newPoints, temp))
         newPoints = newPoints[1:]       #remove the first point [0,0]

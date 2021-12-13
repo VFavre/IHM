@@ -51,8 +51,7 @@ class MainWindow(QMainWindow):
         # TODO 9: connect the signal and the slot
         ###############################
 
-
-
+        self.canvas.selected_template.connect(self.set_action_on_gesture)
 
         ################################
         # ODO 3: fill the template gallery
@@ -69,9 +68,9 @@ class MainWindow(QMainWindow):
         for gesture, label_index in zip(data, labels):
             if label_index != label:
                 # odo 3 add the template in the gallery
-                self.add_template_thumbnail(gesture, name[label])
+                self.add_template_thumbnail(gesture, name[label_index])
                 # odo 4 add the template to the one_dollar_recognizer
-                self.canvas.oneDollar.addTemplate(gesture, name[label])
+                self.canvas.oneDollar.addTemplate(gesture, name[label_index])
                 if not all_gesture:
                     label = label_index
 
@@ -115,8 +114,8 @@ class MainWindow(QMainWindow):
     def set_action_on_gesture(self, label, id, score):
         message = "template: " + label + " score: " + str(score)
         self.textEdit.setPlainText( message+  "\n" + self.textEdit.toPlainText() )
-
-        #todo 9 select the corresponding element in the galery
+        self.gallery.setCurrentRow(id)
+        #odo 9 select the corresponding element in the galery
 
     ##############
     def open(self):
