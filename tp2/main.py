@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+import numpy as np
 
 data = pd.read_csv("Données-élèves-2021/userStats.csv", sep=";")
 print("load done")
@@ -82,5 +83,20 @@ zipped_motiv = zip(result_motivation, file_name)
 sorted_zipped_lists = sorted(zipped_motiv, reverse = True)
 print("Selon les valeurs de motivation  l'ordre d'importance est le suivant : ",sorted_zipped_lists)
 
+norm_hexad = np.linalg.norm(result_hexad)
+normal_hexad = result_hexad/norm_hexad
 
+norm_motiv = np.linalg.norm(result_motivation)
+normal_motiv = result_hexad/norm_motiv
 
+repar_hexad = result_hexad/sum(result_hexad)
+repar_motiv = result_motivation/sum(result_motivation)
+
+mix_reco_vector = []
+
+for i in range(len(normal_hexad)):
+    mix_reco_vector.append((normal_hexad[i] * repar_hexad[i]) + (normal_motiv[i] * repar_motiv[i]))
+
+zipped_mix = zip(mix_reco_vector, file_name)
+sorted_zipped_lists = sorted(zipped_mix, reverse = True)
+print("Selon l'Hexad et la motivation l'ordre d'importance est le suivant : ",sorted_zipped_lists)
