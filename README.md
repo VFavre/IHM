@@ -1,14 +1,5 @@
 # IHM
 
-Tp dollar recognizer 
+TP1 is the tp Dollar Recognize
 
-FAVRE Victor
-
-## BUILD :
-
-éxécuté MainWindow.py pour lancé l'application
-
-## WORK :
-
-tous les TODO ont été implémentés sauf le 11 qui comporte des bug au niveau de l'affichage de la transition.
-
+TP2 is the TP gamification adaptative
